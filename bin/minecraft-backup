@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ -z $1 ]
+then
+    echo "Usage: minecraft-backup <PATH>"
+    exit 1
+fi
+
+if [ ! -d $1 ]
+then
+    echo "Path should be minecraft server root directory."
+    exit 1
+fi
+
+path=$1
+world_dir="$path/world/"
+backup_dir="$path/backup/"
+
+if [ ! -d $world_dir ]
+then
+    echo "Expected world dir at \"$world_dir\"."
+    exit 1
+fi
+
+echo "Backing up world \"$path\"."
+mkdir -p $backup_dir
+zip -r $backup_dir/$(date -I).zip $world_dir
+echo
+
+echo "Cleaning old backups."
+find $backup_dir -type f -mtime +30 -not -name "*01.zip" -print -delete
+echo
+
+echo "Minecraft backup complete."
